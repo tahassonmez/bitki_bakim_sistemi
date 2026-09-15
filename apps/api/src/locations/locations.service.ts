@@ -8,7 +8,9 @@ export class LocationsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CreateLocationDto) {
-    await this.prisma.customer.findUniqueOrThrow({ where: { id: dto.customerId } });
+    await this.prisma.customer.findUniqueOrThrow({
+      where: { id: dto.customerId },
+    });
     return this.prisma.location.create({ data: dto });
   }
 

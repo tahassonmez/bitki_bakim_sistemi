@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -23,14 +27,18 @@ export class StaffService {
       return this.toPublicStaff(staff);
     } catch (error) {
       if ((error as { code?: string }).code === 'P2002') {
-        throw new ConflictException('A staff member with this email already exists');
+        throw new ConflictException(
+          'A staff member with this email already exists',
+        );
       }
       throw error;
     }
   }
 
   async getTodayTasks(staffId: string) {
-    const staff = await this.prisma.staff.findUnique({ where: { id: staffId } });
+    const staff = await this.prisma.staff.findUnique({
+      where: { id: staffId },
+    });
     if (!staff) throw new NotFoundException('Staff member not found');
 
     const today = new Date();
@@ -48,7 +56,15 @@ export class StaffService {
     });
   }
 
-  private toPublicStaff(staff: { id: string; fullName: string; email: string; phone: string | null; role: Role; isActive: boolean; createdAt: Date }) {
+  private toPublicStaff(staff: {
+    id: string;
+    fullName: string;
+    email: string;
+    phone: string | null;
+    role: Role;
+    isActive: boolean;
+    createdAt: Date;
+  }) {
     return {
       id: staff.id,
       fullName: staff.fullName,

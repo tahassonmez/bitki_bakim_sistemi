@@ -9,7 +9,10 @@ export class ProductsService {
   constructor(private readonly prisma: PrismaService) {}
 
   findAll(type?: ProductType) {
-    return this.prisma.product.findMany({ where: type ? { type } : undefined, orderBy: { name: 'asc' } });
+    return this.prisma.product.findMany({
+      where: type ? { type } : undefined,
+      orderBy: { name: 'asc' },
+    });
   }
 
   create(dto: CreateProductDto) {

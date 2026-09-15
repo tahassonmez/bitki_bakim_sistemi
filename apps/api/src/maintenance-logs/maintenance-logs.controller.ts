@@ -12,7 +12,10 @@ export class MaintenanceLogsController {
   constructor(private readonly service: MaintenanceLogsService) {}
 
   @Post()
-  create(@Param('plantId') plantId: string, @Body() dto: CreateMaintenanceLogDto) {
+  create(
+    @Param('plantId') plantId: string,
+    @Body() dto: CreateMaintenanceLogDto,
+  ) {
     return this.service.create(plantId, dto);
   }
 

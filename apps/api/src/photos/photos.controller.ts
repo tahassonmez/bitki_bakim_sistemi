@@ -1,4 +1,14 @@
-import { BadRequestException, Controller, Delete, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Delete,
+  Param,
+  Post,
+  Req,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
@@ -23,7 +33,12 @@ export class PhotosController {
     FileInterceptor('file', {
       limits: { fileSize: 8 * 1024 * 1024 },
       fileFilter: (_request, file, callback) => {
-        callback(null, ['image/jpeg', 'image/png', 'image/heic', 'image/webp'].includes(file.mimetype));
+        callback(
+          null,
+          ['image/jpeg', 'image/png', 'image/heic', 'image/webp'].includes(
+            file.mimetype,
+          ),
+        );
       },
     }),
   )
@@ -32,7 +47,8 @@ export class PhotosController {
     @UploadedFile() file: Express.Multer.File | undefined,
     @Req() request: AuthenticatedRequest,
   ) {
-    if (!file) throw new BadRequestException('A supported image file is required');
+    if (!file)
+      throw new BadRequestException('A supported image file is required');
     return this.service.upload(logId, request.user.id, file);
   }
 

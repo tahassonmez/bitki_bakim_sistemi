@@ -12,8 +12,14 @@ export class AuthService {
   ) {}
 
   async login(dto: LoginDto) {
-    const staff = await this.prisma.staff.findUnique({ where: { email: dto.email } });
-    if (!staff || !staff.isActive || !(await bcrypt.compare(dto.password, staff.passwordHash))) {
+    const staff = await this.prisma.staff.findUnique({
+      where: { email: dto.email },
+    });
+    if (
+      !staff ||
+      !staff.isActive ||
+      !(await bcrypt.compare(dto.password, staff.passwordHash))
+    ) {
       throw new UnauthorizedException('Invalid email or password');
     }
 

@@ -10,12 +10,18 @@ export class PhotosService {
   ) {}
 
   async upload(logId: string, userId: string, file: Express.Multer.File) {
-    const log = await this.prisma.maintenanceLog.findUnique({ where: { id: logId } });
+    const log = await this.prisma.maintenanceLog.findUnique({
+      where: { id: logId },
+    });
     if (!log) throw new NotFoundException('Maintenance log not found');
     const fileName = await this.storage.save(file);
     try {
       return await this.prisma.photo.create({
-        data: { logId, url: this.storage.getUrl(fileName), uploadedById: userId },
+        data: {
+          logId,
+          url: this.storage.getUrl(fileName),
+          uploadedById: userId,
+        },
       });
     } catch (error) {
       await this.storage.delete(fileName);

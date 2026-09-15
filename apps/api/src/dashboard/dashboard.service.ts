@@ -46,12 +46,13 @@ export class DashboardService {
 
   async getSummary() {
     const today = startOfToday();
-    const [customerCount, plantCount, staffCount, todayMaintenanceCount] = await Promise.all([
-      this.prisma.customer.count(),
-      this.prisma.plant.count({ where: { status: PlantStatus.ACTIVE } }),
-      this.prisma.staff.count({ where: { isActive: true } }),
-      this.prisma.maintenanceLog.count({ where: { date: { gte: today } } }),
-    ]);
+    const [customerCount, plantCount, staffCount, todayMaintenanceCount] =
+      await Promise.all([
+        this.prisma.customer.count(),
+        this.prisma.plant.count({ where: { status: PlantStatus.ACTIVE } }),
+        this.prisma.staff.count({ where: { isActive: true } }),
+        this.prisma.maintenanceLog.count({ where: { date: { gte: today } } }),
+      ]);
 
     return { customerCount, plantCount, staffCount, todayMaintenanceCount };
   }
@@ -71,7 +72,9 @@ export class DashboardService {
   }
 
   async getCustomerSummary(customerId: string) {
-    const customer = await this.prisma.customer.findUnique({ where: { id: customerId } });
+    const customer = await this.prisma.customer.findUnique({
+      where: { id: customerId },
+    });
     if (!customer) throw new NotFoundException('Customer not found');
 
     const today = startOfToday();
@@ -79,7 +82,9 @@ export class DashboardService {
     limit.setDate(limit.getDate() + 7);
     const locationFilter = { location: { customerId } };
     const [plantCount, upcomingCount, overdueCount] = await Promise.all([
-      this.prisma.plant.count({ where: { ...locationFilter, status: PlantStatus.ACTIVE } }),
+      this.prisma.plant.count({
+        where: { ...locationFilter, status: PlantStatus.ACTIVE },
+      }),
       this.prisma.plant.count({
         where: {
           ...locationFilter,
@@ -105,7 +110,9 @@ export class DashboardService {
   }
 
   private async ensureStaff(staffId: string) {
-    const staff = await this.prisma.staff.findUnique({ where: { id: staffId } });
+    const staff = await this.prisma.staff.findUnique({
+      where: { id: staffId },
+    });
     if (!staff) throw new NotFoundException('Staff member not found');
     return staff;
   }

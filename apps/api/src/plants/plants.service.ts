@@ -57,12 +57,18 @@ export class PlantsService {
     });
   }
 
-  findAll(filters: { customerId?: string; locationId?: string; status?: PlantStatus }) {
+  findAll(filters: {
+    customerId?: string;
+    locationId?: string;
+    status?: PlantStatus;
+  }) {
     return this.prisma.plant.findMany({
       where: {
         status: filters.status,
         locationId: filters.locationId,
-        location: filters.customerId ? { customerId: filters.customerId } : undefined,
+        location: filters.customerId
+          ? { customerId: filters.customerId }
+          : undefined,
       },
       orderBy: { plantCode: 'asc' },
       include: { location: { include: { customer: true } } },
@@ -98,24 +104,40 @@ export class PlantsService {
 
   async updateStatus(id: string, dto: UpdatePlantStatusDto) {
     await this.findOne(id);
-    return this.prisma.plant.update({ where: { id }, data: { status: dto.status } });
+    return this.prisma.plant.update({
+      where: { id },
+      data: { status: dto.status },
+    });
   }
 
   async getQrCodeBuffer(id: string) {
     const plant = await this.prisma.plant.findUnique({ where: { id } });
     if (!plant) throw new NotFoundException('Plant not found');
-    const baseUrl = this.config.get<string>('WEB_APP_BASE_URL') ?? 'http://localhost:3000';
-    return QRCode.toBuffer(`${baseUrl}/plants/${plant.id}`, { type: 'png', width: 400, margin: 2 });
+    const baseUrl =
+      this.config.get<string>('WEB_APP_BASE_URL') ?? 'http://localhost:3000';
+    return QRCode.toBuffer(`${baseUrl}/plants/${plant.id}`, {
+      type: 'png',
+      width: 400,
+      margin: 2,
+    });
   }
 
   private async ensureLocation(locationId: string) {
-    const location = await this.prisma.location.findUnique({ where: { id: locationId } });
+    const location = await this.prisma.location.findUnique({
+      where: { id: locationId },
+    });
     if (!location) throw new NotFoundException('Location not found');
   }
 
-  private async generatePlantCodes(count: number, tx: Prisma.TransactionClient) {
+  private async generatePlantCodes(
+    count: number,
+    tx: Prisma.TransactionClient,
+  ) {
     const last = await tx.plant.findFirst({ orderBy: { plantCode: 'desc' } });
     let nextNumber = last ? Number(last.plantCode.split('-')[1]) + 1 : 1;
-    return Array.from({ length: count }, () => `WSK-${String(nextNumber++).padStart(6, '0')}`);
+    return Array.from(
+      { length: count },
+      () => `WSK-${String(nextNumber++).padStart(6, '0')}`,
+    );
   }
 }

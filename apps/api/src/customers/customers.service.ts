@@ -13,7 +13,9 @@ export class CustomersService {
 
   findAll(search?: string) {
     return this.prisma.customer.findMany({
-      where: search ? { name: { contains: search, mode: 'insensitive' } } : undefined,
+      where: search
+        ? { name: { contains: search, mode: 'insensitive' } }
+        : undefined,
       orderBy: { name: 'asc' },
       include: { _count: { select: { locations: true } } },
     });
@@ -41,11 +43,17 @@ export class CustomersService {
     today.setHours(0, 0, 0, 0);
     const limit = new Date(today);
     limit.setDate(limit.getDate() + 7);
-    const customerPlants = { location: { customerId: id }, status: 'ACTIVE' as const };
+    const customerPlants = {
+      location: { customerId: id },
+      status: 'ACTIVE' as const,
+    };
     const [plantCount, upcomingCount, overdueCount] = await Promise.all([
       this.prisma.plant.count({ where: customerPlants }),
       this.prisma.plant.count({
-        where: { ...customerPlants, nextMaintenanceDate: { gte: today, lte: limit } },
+        where: {
+          ...customerPlants,
+          nextMaintenanceDate: { gte: today, lte: limit },
+        },
       }),
       this.prisma.plant.count({
         where: { ...customerPlants, nextMaintenanceDate: { lt: today } },

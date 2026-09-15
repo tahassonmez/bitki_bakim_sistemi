@@ -1,4 +1,10 @@
-import { Controller, Get, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  ParseIntPipe,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { DashboardService } from './dashboard.service.js';
@@ -12,7 +18,9 @@ export class DashboardController {
 
   @Get('upcoming')
   @ApiQuery({ name: 'days', required: false, type: Number, example: 7 })
-  getUpcoming(@Query('days', new ParseIntPipe({ optional: true })) days?: number) {
+  getUpcoming(
+    @Query('days', new ParseIntPipe({ optional: true })) days?: number,
+  ) {
     return this.dashboardService.getUpcoming(days ?? 7);
   }
 

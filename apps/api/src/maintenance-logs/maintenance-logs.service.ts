@@ -9,7 +9,9 @@ export class MaintenanceLogsService {
 
   async create(plantId: string, dto: CreateMaintenanceLogDto) {
     return this.prisma.$transaction(async (tx) => {
-      const plant = await tx.plant.findUniqueOrThrow({ where: { id: plantId } });
+      const plant = await tx.plant.findUniqueOrThrow({
+        where: { id: plantId },
+      });
       await tx.staff.findUniqueOrThrow({ where: { id: dto.staffId } });
       const logDate = new Date(dto.date);
 
@@ -21,7 +23,12 @@ export class MaintenanceLogsService {
           notes: dto.notes,
           actions: { create: dto.typeIds.map((typeId) => ({ typeId })) },
           products: dto.products
-            ? { create: dto.products.map((product) => ({ productId: product.productId, quantityUsed: product.quantityUsed })) }
+            ? {
+                create: dto.products.map((product) => ({
+                  productId: product.productId,
+                  quantityUsed: product.quantityUsed,
+                })),
+              }
             : undefined,
         },
         include: {
@@ -35,7 +42,10 @@ export class MaintenanceLogsService {
         where: { id: plantId },
         data: {
           lastMaintenanceDate: logDate,
-          nextMaintenanceDate: calculateNextMaintenanceDate(logDate, plant.careFrequencyDays),
+          nextMaintenanceDate: calculateNextMaintenanceDate(
+            logDate,
+            plant.careFrequencyDays,
+          ),
         },
       });
       return log;
