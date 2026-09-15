@@ -4,6 +4,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
 import { CustomersModule } from './customers/customers.module.js';
+import { DashboardModule } from './dashboard/dashboard.module.js';
 import { HealthController } from './health/health.controller.js';
 import { LocationsModule } from './locations/locations.module.js';
 import { MaintenanceLogsModule } from './maintenance-logs/maintenance-logs.module.js';
@@ -20,6 +21,7 @@ import { StaffModule } from './staff/staff.module.js';
     PrismaModule,
     AuthModule,
     StaffModule,
+    DashboardModule,
     CustomersModule,
     LocationsModule,
     PlantsModule,

@@ -22,6 +22,11 @@ export class CustomersController {
     return this.customersService.findAll(search);
   }
 
+  @Get(':id/summary')
+  getSummary(@Param('id') id: string) {
+    return this.customersService.getSummary(id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.customersService.findOne(id);

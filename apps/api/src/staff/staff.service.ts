@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -27,6 +27,25 @@ export class StaffService {
       }
       throw error;
     }
+  }
+
+  async getTodayTasks(staffId: string) {
+    const staff = await this.prisma.staff.findUnique({ where: { id: staffId } });
+    if (!staff) throw new NotFoundException('Staff member not found');
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    return this.prisma.plant.findMany({
+      where: {
+        status: 'ACTIVE',
+        nextMaintenanceDate: { lt: tomorrow },
+      },
+      include: { location: { include: { customer: true } } },
+      orderBy: [{ nextMaintenanceDate: 'asc' }, { plantCode: 'asc' }],
+    });
   }
 
   private toPublicStaff(staff: { id: string; fullName: string; email: string; phone: string | null; role: Role; isActive: boolean; createdAt: Date }) {
