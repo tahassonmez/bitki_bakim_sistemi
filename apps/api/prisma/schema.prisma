@@ -23,6 +23,12 @@ enum PlantStatus {
   REMOVED
 }
 
+enum ProductType {
+  FERTILIZER
+  PESTICIDE
+  OTHER
+}
+
 model Customer {
   id        String     @id @default(cuid())
   name      String
@@ -36,44 +42,110 @@ model Customer {
 }
 
 model Location {
-  id         String     @id @default(cuid())
+  id         String   @id @default(cuid())
   name       String
   customerId String
-  customer   Customer   @relation(fields: [customerId], references: [id])
+  customer   Customer @relation(fields: [customerId], references: [id])
   plants     Plant[]
-  createdAt  DateTime   @default(now())
+  createdAt  DateTime @default(now())
 
   @@index([customerId])
 }
 
 model Staff {
-  id           String   @id @default(cuid())
-  fullName     String
-  email        String   @unique
-  phone        String?
-  passwordHash String
-  role         Role     @default(STAFF)
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
+  id              String           @id @default(cuid())
+  fullName        String
+  email           String           @unique
+  phone           String?
+  passwordHash    String
+  role            Role             @default(STAFF)
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  maintenanceLogs MaintenanceLog[]
 }
 
 model Plant {
-  id                   String      @id @default(cuid())
-  plantCode            String      @unique
-  name                 String
-  species              String
-  locationId           String
-  location             Location    @relation(fields: [locationId], references: [id])
-  potInfo              String?
-  sizeInfo             String?
-  registeredAt         DateTime    @default(now())
-  careFrequencyDays    Int
-  lastMaintenanceDate  DateTime?
-  nextMaintenanceDate  DateTime?
-  status               PlantStatus @default(ACTIVE)
-  createdAt            DateTime    @default(now())
-  updatedAt            DateTime    @updatedAt
+  id                  String           @id @default(cuid())
+  plantCode           String           @unique
+  name                String
+  species             String
+  locationId          String
+  location            Location         @relation(fields: [locationId], references: [id])
+  potInfo             String?
+  sizeInfo            String?
+  registeredAt        DateTime         @default(now())
+  careFrequencyDays   Int
+  lastMaintenanceDate DateTime?
+  nextMaintenanceDate DateTime?
+  status              PlantStatus      @default(ACTIVE)
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  maintenanceLogs     MaintenanceLog[]
 
   @@index([locationId])
   @@index([nextMaintenanceDate])
+}
+
+model MaintenanceType {
+  id       String                 @id @default(cuid())
+  name     String                 @unique
+  isActive Boolean                @default(true)
+  actions  MaintenanceLogAction[]
+}
+
+model Product {
+  id            String                  @id @default(cuid())
+  name          String
+  type          ProductType
+  unit          String?
+  stockQuantity Float?
+  notes         String?
+  usages        MaintenanceLogProduct[]
+}
+
+model MaintenanceLog {
+  id        String                  @id @default(cuid())
+  plantId   String
+  plant     Plant                   @relation(fields: [plantId], references: [id])
+  staffId   String
+  staff     Staff                   @relation(fields: [staffId], references: [id])
+  date      DateTime                @default(now())
+  notes     String?
+  actions   MaintenanceLogAction[]
+  products  MaintenanceLogProduct[]
+  photos    Photo[]
+  createdAt DateTime                @default(now())
+
+  @@index([plantId])
+  @@index([date])
+}
+
+model MaintenanceLogAction {
+  id     String          @id @default(cuid())
+  logId  String
+  log    MaintenanceLog  @relation(fields: [logId], references: [id])
+  typeId String
+  type   MaintenanceType @relation(fields: [typeId], references: [id])
+
+  @@unique([logId, typeId])
+}
+
+model MaintenanceLogProduct {
+  id           String         @id @default(cuid())
+  logId        String
+  log          MaintenanceLog @relation(fields: [logId], references: [id])
+  productId    String
+  product      Product        @relation(fields: [productId], references: [id])
+  quantityUsed Float?
+
+  @@unique([logId, productId])
+}
+
+model Photo {
+  id           String         @id @default(cuid())
+  logId        String
+  log          MaintenanceLog @relation(fields: [logId], references: [id])
+  url          String
+  uploadedById String
+  createdAt    DateTime       @default(now())
 }
