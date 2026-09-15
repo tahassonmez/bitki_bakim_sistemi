@@ -1,0 +1,28 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --ink: #18211d;
+  --muted: #68736d;
+  --paper: #f7f8f4;
+  --leaf: #2f6b4f;
+  --leaf-dark: #1f4937;
+  --line: #dfe5dc;
+  font-family: 'DM Sans', sans-serif;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); }
+h1, h2, h3, .display { font-family: 'Space Grotesk', sans-serif; }
+button, input { font: inherit; }
+
+@layer components {
+  .panel { @apply rounded-2xl border border-[#dfe5dc] bg-white shadow-[0_18px_45px_rgba(38,61,48,0.07)]; }
+  .button-primary { @apply inline-flex min-h-11 items-center justify-center rounded-xl bg-[#2f6b4f] px-5 font-semibold text-white transition hover:bg-[#1f4937] disabled:cursor-not-allowed disabled:opacity-50; }
+  .button-secondary { @apply inline-flex min-h-11 items-center justify-center rounded-xl border border-[#cfd9d0] bg-white px-5 font-semibold text-[#2f6b4f] transition hover:bg-[#edf4ed]; }
+  .field-input { @apply min-h-12 w-full rounded-xl border border-[#d5ded5] bg-[#fbfcfa] px-4 text-[#18211d] outline-none transition placeholder:text-[#9aa49d] focus:border-[#2f6b4f] focus:ring-4 focus:ring-[#2f6b4f]/10; }
+}
