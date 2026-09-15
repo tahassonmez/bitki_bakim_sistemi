@@ -1,0 +1,1 @@
+# bitki_bakim_sistemi
