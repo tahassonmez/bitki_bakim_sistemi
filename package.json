@@ -1,0 +1,11 @@
+﻿{
+  "name": "bitki-bakim-sistemi",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "lint": "pnpm -r --if-present lint",
+    "format": "prettier --write .",
+    "dev:api": "pnpm --filter @hr/api dev",
+    "dev:web": "pnpm --filter @hr/web dev"
+  }
+}

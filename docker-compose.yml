@@ -1,0 +1,21 @@
+﻿services:
+  postgres:
+    image: postgres:16
+    container_name: bitki-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bitki
+      POSTGRES_PASSWORD: bitki_dev_password
+      POSTGRES_DB: bitki_dev
+    ports:
+      - "5435:5432"
+    volumes:
+      - bitki_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bitki"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  bitki_pg_data:
