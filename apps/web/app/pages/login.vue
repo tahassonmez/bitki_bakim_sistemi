@@ -26,6 +26,7 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
+import { useAuthStore } from '~/stores/auth';
 
 definePageMeta({ layout: false });
 

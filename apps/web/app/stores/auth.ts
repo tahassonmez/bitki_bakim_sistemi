@@ -1,3 +1,4 @@
+import { defineStore } from 'pinia';
 import type { AuthUser, LoginResponse } from '~/types/api';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -8,7 +9,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function login(email: string, password: string) {
     const config = useRuntimeConfig();
     const response = await $fetch<{ data: LoginResponse }>('/auth/login', {
-      baseURL: config.public.apiBase,
+      baseURL: String(config.public.apiBase),
       method: 'POST',
       body: { email, password },
     });

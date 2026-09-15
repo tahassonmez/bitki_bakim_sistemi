@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/auth';
 import type { DashboardSummary, PlantTask } from '~/types/api';
 
 definePageMeta({ layout: 'admin' });

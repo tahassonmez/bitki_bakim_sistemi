@@ -9,7 +9,7 @@ export function useApi() {
     if (token.value) headers.set('Authorization', `Bearer ${token.value}`);
 
     const response = await $fetch<{ data: T }>(path, {
-      baseURL: config.public.apiBase,
+      baseURL: String(config.public.apiBase),
       ...options,
       headers,
     });

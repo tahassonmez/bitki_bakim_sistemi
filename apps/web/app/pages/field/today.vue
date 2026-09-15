@@ -9,6 +9,7 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '~/stores/auth';
 import type { PlantTask } from '~/types/api';
 
 definePageMeta({ layout: 'field' });
