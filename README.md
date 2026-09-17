@@ -1,4 +1,4 @@
-﻿# Bitki Bakım Takip Sistemi
+# Bitki Bakım Takip Sistemi
 
 Peyzaj/bitki bakım ekipleri için müşteri, bitki ve bakım takip sistemi.
 
