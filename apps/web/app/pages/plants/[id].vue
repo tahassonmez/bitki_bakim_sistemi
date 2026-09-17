@@ -49,6 +49,14 @@
       </div>
     </div>
 
+    <div class="panel mt-10 p-6 sm:p-8 print:hidden">
+      <h3 class="display text-xl font-semibold">Bakım yap</h3>
+      <p class="mt-1 text-sm text-[#68736d]">Yapılan işlemleri işaretle, kullanılan ürünü ekle, istersen fotoğraf çek.</p>
+      <div class="mt-6">
+        <MaintenanceLogForm :plant-id="plantId" @saved="onMaintenanceSaved" />
+      </div>
+    </div>
+
     <div class="mt-10 flex items-center justify-between">
       <h3 class="display text-xl font-semibold">Bakım geçmişi</h3>
       <span class="text-sm text-[#68736d]">{{ logs?.length ?? 0 }} kayıt</span>
@@ -108,10 +116,14 @@ const route = useRoute();
 const plantId = route.params.id as string;
 const { request } = useApi();
 
-const { data: plant, pending } = await useAsyncData(`plant-${plantId}`, () => request<PlantDetail>(`/plants/${plantId}`));
-const { data: logs, pending: logsPending } = await useAsyncData(`plant-${plantId}-logs`, () =>
+const { data: plant, pending, refresh } = await useAsyncData(`plant-${plantId}`, () => request<PlantDetail>(`/plants/${plantId}`));
+const { data: logs, pending: logsPending, refresh: refreshLogs } = await useAsyncData(`plant-${plantId}-logs`, () =>
   request<MaintenanceLog[]>(`/plants/${plantId}/maintenance-logs`),
 );
+
+async function onMaintenanceSaved() {
+  await Promise.all([refresh(), refreshLogs()]);
+}
 
 const allPhotos = computed(() => (logs.value ?? []).flatMap((log) => log.photos));
 const lightboxPhoto = ref<string | null>(null);
