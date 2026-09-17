@@ -65,6 +65,74 @@ export interface Plant {
   name: string;
   species: string;
   status: PlantStatus;
+  careFrequencyDays: number;
+  locationId: string;
+  lastMaintenanceDate: string | null;
   nextMaintenanceDate: string | null;
-  location: { id: string; name: string; customer?: { id: string; name: string } };
+  location: { id: string; name: string; customer: { id: string; name: string } };
+}
+
+export interface PlantDetail extends Plant {
+  potInfo: string | null;
+  sizeInfo: string | null;
+  registeredAt: string;
+}
+
+export interface CreatePlantInput {
+  name: string;
+  species: string;
+  locationId: string;
+  potInfo?: string | null;
+  sizeInfo?: string | null;
+  careFrequencyDays: number;
+}
+
+export interface CreateBulkPlantsInput extends CreatePlantInput {
+  quantity: number;
+}
+
+export interface MaintenanceStaffRef {
+  id: string;
+  fullName: string;
+  email: string;
+}
+
+export interface MaintenanceTypeRef {
+  id: string;
+  name: string;
+}
+
+export interface MaintenanceProductRef {
+  id: string;
+  name: string;
+  unit: string | null;
+}
+
+export interface MaintenanceLogActionEntry {
+  id: string;
+  typeId: string;
+  type: MaintenanceTypeRef;
+}
+
+export interface MaintenanceLogProductEntry {
+  id: string;
+  productId: string;
+  product: MaintenanceProductRef;
+  quantityUsed: number | null;
+}
+
+export interface MaintenancePhoto {
+  id: string;
+  url: string;
+  createdAt: string;
+}
+
+export interface MaintenanceLog {
+  id: string;
+  date: string;
+  notes: string | null;
+  staff: MaintenanceStaffRef;
+  actions: MaintenanceLogActionEntry[];
+  products: MaintenanceLogProductEntry[];
+  photos: MaintenancePhoto[];
 }

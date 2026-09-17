@@ -1,0 +1,160 @@
+<template>
+  <div v-if="pending">
+    <div class="h-40 animate-pulse rounded-2xl bg-[#e5ebe3]" />
+  </div>
+  <div v-else-if="!plant">
+    <p class="panel p-10 text-center text-sm text-[#68736d]">Bitki bulunamadı.</p>
+  </div>
+  <div v-else>
+    <NuxtLink to="/plants" class="text-sm font-semibold text-[#2f6b4f]">← Bitkilere dön</NuxtLink>
+
+    <div class="mt-4 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+      <div>
+        <p class="font-mono text-xs text-[#8a948d]">{{ plant.plantCode }}</p>
+        <h2 class="display mt-1 text-3xl font-semibold tracking-tight">{{ plant.name }}</h2>
+        <p class="mt-1 text-[#68736d]">{{ plant.species }} · {{ plant.location.customer.name }} · {{ plant.location.name }}</p>
+      </div>
+      <span
+        class="h-fit rounded-full px-3 py-1 text-xs font-semibold"
+        :class="plant.status === 'ACTIVE' ? 'bg-[#e4f0dd] text-[#2f6b4f]' : 'bg-[#f0ece5] text-[#8a7b5f]'"
+      >
+        {{ plant.status === 'ACTIVE' ? 'Aktif' : 'Kaldırıldı' }}
+      </span>
+    </div>
+
+    <div class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div class="panel p-5"><p class="text-xs font-semibold uppercase tracking-[0.14em] text-[#8a948d]">Saksı</p><p class="mt-2 font-semibold">{{ plant.potInfo || '—' }}</p></div>
+      <div class="panel p-5"><p class="text-xs font-semibold uppercase tracking-[0.14em] text-[#8a948d]">Ölçü</p><p class="mt-2 font-semibold">{{ plant.sizeInfo || '—' }}</p></div>
+      <div class="panel p-5"><p class="text-xs font-semibold uppercase tracking-[0.14em] text-[#8a948d]">Sisteme giriş</p><p class="mt-2 font-semibold">{{ formatDate(plant.registeredAt) }}</p></div>
+      <div class="panel p-5"><p class="text-xs font-semibold uppercase tracking-[0.14em] text-[#8a948d]">Bakım sıklığı</p><p class="mt-2 font-semibold">{{ plant.careFrequencyDays }} günde bir</p></div>
+      <div class="panel p-5"><p class="text-xs font-semibold uppercase tracking-[0.14em] text-[#8a948d]">Son bakım</p><p class="mt-2 font-semibold">{{ formatDate(plant.lastMaintenanceDate) }}</p></div>
+      <div class="panel p-5">
+        <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[#8a948d]">Sıradaki bakım</p>
+        <p class="mt-2 font-semibold" :class="isOverdue ? 'text-[#a15d47]' : ''">{{ formatDate(plant.nextMaintenanceDate) }}</p>
+      </div>
+    </div>
+
+    <div class="panel mt-10 p-6 sm:p-8">
+      <h3 class="display text-xl font-semibold">QR kod</h3>
+      <p class="mt-1 text-sm text-[#68736d]">Sahada bu kodu okutan personel doğrudan bu sayfaya yönlenir.</p>
+      <div class="mt-5 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+        <div class="grid size-40 place-items-center rounded-2xl border border-[#dfe5dc] bg-white p-3">
+          <img v-if="qrCodeUrl" :src="qrCodeUrl" alt="QR kod" class="size-full object-contain" />
+          <div v-else class="size-full animate-pulse rounded-xl bg-[#e5ebe3]" />
+        </div>
+        <div class="flex gap-3 print:hidden">
+          <a v-if="qrCodeUrl" :href="qrCodeUrl" :download="`${plant.plantCode}-qr.png`" class="button-secondary">İndir</a>
+          <button type="button" class="button-secondary" @click="printPage">Yazdır</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-10 flex items-center justify-between">
+      <h3 class="display text-xl font-semibold">Bakım geçmişi</h3>
+      <span class="text-sm text-[#68736d]">{{ logs?.length ?? 0 }} kayıt</span>
+    </div>
+    <div v-if="logsPending" class="mt-4 h-24 animate-pulse rounded-2xl bg-[#e5ebe3]" />
+    <div v-else-if="!logs?.length" class="panel mt-4 p-8 text-center text-sm text-[#68736d]">Henüz bakım kaydı girilmedi.</div>
+    <div v-else class="mt-4 space-y-4">
+      <div v-for="log in logs" :key="log.id" class="panel p-5">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <p class="font-semibold">{{ formatDateTime(log.date) }}</p>
+          <p class="text-sm text-[#68736d]">{{ log.staff.fullName }}</p>
+        </div>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <span v-for="action in log.actions" :key="action.id" class="rounded-full bg-[#e4f0dd] px-3 py-1 text-xs font-semibold text-[#2f6b4f]">
+            {{ action.type.name }}
+          </span>
+        </div>
+        <p v-if="log.products.length" class="mt-3 text-sm text-[#68736d]">
+          Kullanılan ürünler:
+          <span v-for="(usage, index) in log.products" :key="usage.id">
+            {{ usage.product.name }}<template v-if="usage.quantityUsed"> ({{ usage.quantityUsed }}{{ usage.product.unit ? ' ' + usage.product.unit : '' }})</template>{{ index < log.products.length - 1 ? ', ' : '' }}
+          </span>
+        </p>
+        <p v-if="log.notes" class="mt-3 text-sm text-[#3c453f]">{{ log.notes }}</p>
+      </div>
+    </div>
+
+    <div class="mt-10 flex items-center justify-between">
+      <h3 class="display text-xl font-semibold">Fotoğraflar</h3>
+      <span class="text-sm text-[#68736d]">{{ allPhotos.length }} fotoğraf</span>
+    </div>
+    <div v-if="!allPhotos.length" class="panel mt-4 p-8 text-center text-sm text-[#68736d]">Henüz fotoğraf eklenmedi.</div>
+    <div v-else class="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4 xl:grid-cols-6">
+      <button
+        v-for="photo in allPhotos"
+        :key="photo.id"
+        type="button"
+        class="aspect-square overflow-hidden rounded-xl border border-[#dfe5dc]"
+        @click="lightboxPhoto = photo.url"
+      >
+        <img :src="photo.url" class="size-full object-cover" alt="Bakım fotoğrafı" />
+      </button>
+    </div>
+
+    <div v-if="lightboxPhoto" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" @click="lightboxPhoto = null">
+      <img :src="lightboxPhoto" class="max-h-full max-w-full rounded-xl" alt="Bakım fotoğrafı büyük görünüm" />
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import type { MaintenanceLog, PlantDetail } from '~/types/api';
+
+definePageMeta({ layout: 'admin' });
+
+const route = useRoute();
+const plantId = route.params.id as string;
+const { request } = useApi();
+
+const { data: plant, pending } = await useAsyncData(`plant-${plantId}`, () => request<PlantDetail>(`/plants/${plantId}`));
+const { data: logs, pending: logsPending } = await useAsyncData(`plant-${plantId}-logs`, () =>
+  request<MaintenanceLog[]>(`/plants/${plantId}/maintenance-logs`),
+);
+
+const allPhotos = computed(() => (logs.value ?? []).flatMap((log) => log.photos));
+const lightboxPhoto = ref<string | null>(null);
+
+const today = new Date();
+today.setHours(0, 0, 0, 0);
+const isOverdue = computed(() => {
+  if (!plant.value?.nextMaintenanceDate) return false;
+  return new Date(plant.value.nextMaintenanceDate) < today;
+});
+
+const formatDate = (date: string | null) =>
+  date ? new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(date)) : '—';
+const formatDateTime = (date: string) =>
+  new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(
+    new Date(date),
+  );
+
+const qrCodeUrl = ref<string | null>(null);
+let qrObjectUrl: string | null = null;
+
+async function loadQrCode() {
+  const config = useRuntimeConfig();
+  const token = useCookie<string | null>('auth_token');
+  try {
+    const response = await fetch(`${config.public.apiBase}/plants/${plantId}/qrcode`, {
+      headers: token.value ? { Authorization: `Bearer ${token.value}` } : {},
+    });
+    if (!response.ok) return;
+    const blob = await response.blob();
+    qrObjectUrl = URL.createObjectURL(blob);
+    qrCodeUrl.value = qrObjectUrl;
+  } catch {
+    // sessizce yok say; kullanıcı sayfayı yenileyip tekrar deneyebilir
+  }
+}
+
+onMounted(loadQrCode);
+onBeforeUnmount(() => {
+  if (qrObjectUrl) URL.revokeObjectURL(qrObjectUrl);
+});
+
+function printPage() {
+  window.print();
+}
+</script>
