@@ -50,7 +50,18 @@
 
     <div class="mt-10 flex items-center justify-between">
       <h3 class="display text-xl font-semibold">Bitkiler</h3>
-      <span class="text-sm text-[#68736d]">{{ plants?.length ?? 0 }} kayıt</span>
+      <div class="flex items-center gap-3">
+        <span class="text-sm text-[#68736d]">{{ plants?.length ?? 0 }} kayıt</span>
+        <button
+          class="button-primary !min-h-9 !px-3 text-sm"
+          type="button"
+          :disabled="!customer.locations.length"
+          :title="!customer.locations.length ? 'Önce bir konum ekle' : undefined"
+          @click="showPlantModal = true"
+        >
+          + Yeni bitki
+        </button>
+      </div>
     </div>
     <div v-if="plantsPending" class="mt-4 h-24 animate-pulse rounded-2xl bg-[#e5ebe3]" />
     <div v-else-if="!plants?.length" class="panel mt-4 p-8 text-center text-sm text-[#68736d]">
@@ -94,6 +105,13 @@
       @close="activeModal = false"
       @saved="onLocationSaved"
     />
+
+    <PlantFormModal
+      v-if="showPlantModal"
+      :default-customer-id="customer.id"
+      @close="showPlantModal = false"
+      @saved="onPlantSaved"
+    />
   </div>
 </template>
 
@@ -110,7 +128,7 @@ const { data: customer, pending, refresh } = await useAsyncData(`customer-${cust
   request<CustomerDetail>(`/customers/${customerId}`),
 );
 
-const { data: plants, pending: plantsPending } = await useAsyncData(`customer-${customerId}-plants`, () =>
+const { data: plants, pending: plantsPending, refresh: refreshPlants } = await useAsyncData(`customer-${customerId}-plants`, () =>
   request<Plant[]>(`/plants?customerId=${customerId}`),
 );
 
@@ -121,5 +139,10 @@ function openLocationModal(location?: Location) {
 async function onLocationSaved() {
   activeModal.value = false;
   await refresh();
+}
+
+const showPlantModal = ref(false);
+async function onPlantSaved() {
+  await Promise.all([refresh(), refreshPlants()]);
 }
 </script>

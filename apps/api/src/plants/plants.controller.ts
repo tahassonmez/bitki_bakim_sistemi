@@ -41,8 +41,9 @@ export class PlantsController {
     @Query('customerId') customerId?: string,
     @Query('locationId') locationId?: string,
     @Query('status') status?: PlantStatus,
+    @Query('code') code?: string,
   ) {
-    return this.plantsService.findAll({ customerId, locationId, status });
+    return this.plantsService.findAll({ customerId, locationId, status, code });
   }
 
   @Get(':id/qrcode')

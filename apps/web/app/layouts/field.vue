@@ -1,16 +1,35 @@
 <template>
-  <div class="min-h-screen bg-[#f7f8f4] pb-24">
-    <header class="sticky top-0 z-10 flex items-center justify-between border-b border-[#dfe5dc] bg-[#f7f8f4]/95 px-5 py-4 backdrop-blur">
-      <button class="grid size-11 place-items-center rounded-xl border border-[#d5ded5] bg-white text-lg" type="button" aria-label="Geri" @click="router.back()">←</button>
-      <div class="text-center"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#6b786f]">Saha modu</p><h1 class="display font-semibold">Bugünün bakımları</h1></div>
-      <button class="grid size-11 place-items-center rounded-xl bg-[#203d30] text-sm text-white" type="button" aria-label="Çıkış" @click="auth.logout()">↗</button>
+  <div class="min-h-screen bg-[#f7f8f4] pb-28">
+    <header class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-[#dfe5dc] bg-[#f7f8f4]/95 px-5 pb-4 pt-[max(1rem,env(safe-area-inset-top))] backdrop-blur">
+      <button
+        v-if="showBack"
+        class="grid size-11 shrink-0 place-items-center rounded-xl border border-[#d5ded5] bg-white text-lg"
+        type="button"
+        aria-label="Geri"
+        @click="goBack"
+      >←</button>
+      <NuxtLink
+        v-else
+        to="/field/today"
+        class="grid size-11 shrink-0 place-items-center rounded-xl bg-[#d8e8cc] text-lg text-[#203d30]"
+        aria-label="Ana sayfa"
+      >✦</NuxtLink>
+      <div class="min-w-0 text-center"><p class="text-xs font-semibold uppercase tracking-[0.18em] text-[#6b786f]">Saha modu</p><h1 class="display truncate font-semibold">{{ pageTitle }}</h1></div>
+      <button class="flex h-11 shrink-0 items-center gap-1.5 rounded-xl bg-[#203d30] px-3 text-sm font-semibold text-white" type="button" aria-label="Çıkış yap" @click="auth.logout()"><span class="text-base leading-none">↗</span><span>Çıkış</span></button>
     </header>
     <main class="mx-auto max-w-xl px-5 py-6"><slot /></main>
-    <nav class="fixed inset-x-0 bottom-0 z-20 border-t border-[#dfe5dc] bg-white/95 px-5 py-3 backdrop-blur">
+    <nav class="fixed inset-x-0 bottom-0 z-20 border-t border-[#dfe5dc] bg-white/95 px-5 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
       <div class="mx-auto flex max-w-xl items-center justify-between gap-3">
-        <NuxtLink to="/field/today" class="flex flex-1 flex-col items-center gap-1 rounded-xl py-2 text-xs font-semibold text-[#2f6b4f]">⌂<span>Bugün</span></NuxtLink>
-        <button class="flex flex-1 flex-col items-center gap-1 rounded-xl bg-[#d8e8cc] py-2 text-xs font-semibold text-[#203d30]" type="button"><span class="text-xl leading-4">⌗</span><span>QR Tara</span></button>
-        <NuxtLink to="/field/today" class="flex flex-1 flex-col items-center gap-1 rounded-xl py-2 text-xs font-semibold text-[#6b786f]">☰<span>Menü</span></NuxtLink>
+        <NuxtLink
+          v-for="item in navItems"
+          :key="item.to"
+          :to="item.to"
+          class="flex flex-1 flex-col items-center gap-1 rounded-xl py-2 text-xs font-semibold transition"
+          :class="isActive(item.to) ? 'bg-[#d8e8cc] text-[#203d30]' : 'text-[#6b786f]'"
+        >
+          <span class="text-xl leading-4">{{ item.icon }}</span>
+          <span>{{ item.label }}</span>
+        </NuxtLink>
       </div>
     </nav>
   </div>
@@ -21,4 +40,32 @@ import { useAuthStore } from '~/stores/auth';
 
 const auth = useAuthStore();
 const router = useRouter();
+const route = useRoute();
+
+const navItems = [
+  { to: '/field/today', icon: '⌂', label: 'Bugün' },
+  { to: '/field/scan', icon: '⌗', label: 'QR Tara' },
+  { to: '/field/menu', icon: '☰', label: 'Menü' },
+];
+
+const isActive = (path: string) => route.path === path;
+const showBack = computed(() => !navItems.some((item) => item.to === route.path));
+
+const pageTitle = computed(() => {
+  if (route.path.startsWith('/field/scan')) return 'QR kodu okut';
+  if (route.path.startsWith('/field/menu')) return 'Menü';
+  if (route.path.startsWith('/plants/')) return 'Bitki detayı';
+  return 'Bugünün bakımları';
+});
+
+function goBack() {
+  // Sayfa doğrudan bu ekrana açıldıysa (ör. QR taramadan sonra, yenilemeden
+  // sonra ya da geçmişte önceki sayfa yoksa) router.back() hiçbir şey
+  // yapmaz ve kullanıcı ekranda "takılı" kalır. Geçmiş yoksa ana sekmeye dön.
+  if (window.history.length > 1) {
+    router.back();
+  } else {
+    router.push('/field/today');
+  }
+}
 </script>

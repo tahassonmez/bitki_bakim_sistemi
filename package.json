@@ -5,7 +5,11 @@
   "scripts": {
     "lint": "pnpm -r --if-present lint",
     "format": "prettier --write .",
-    "dev:api": "pnpm --filter @hr/api dev",
-    "dev:web": "pnpm --filter @hr/web dev"
+    "dev:api": "pnpm --filter @hr/api start:dev",
+    "dev:web": "pnpm --filter @hr/web dev",
+    "test:api": "pnpm --filter @hr/api test",
+    "test:api:e2e": "pnpm --filter @hr/api test:e2e",
+    "build:api": "pnpm --filter @hr/api build",
+    "build:web": "pnpm --filter @hr/web build"
   }
 }

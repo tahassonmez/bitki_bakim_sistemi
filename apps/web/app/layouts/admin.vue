@@ -6,10 +6,11 @@
         <span><strong class="display block text-lg">Verdant</strong><small class="text-xs text-[#b8cdbb]">Bitki bakım merkezi</small></span>
       </NuxtLink>
       <nav class="space-y-2 text-sm">
-        <NuxtLink to="/dashboard" class="flex items-center gap-3 rounded-xl px-4 py-3 text-[#d7e6d8] transition hover:bg-white/10">◈ <span>Genel bakış</span></NuxtLink>
-        <NuxtLink to="/customers" class="flex items-center gap-3 rounded-xl px-4 py-3 text-[#d7e6d8] transition hover:bg-white/10">⌂ <span>Müşteriler</span></NuxtLink>
-        <NuxtLink to="/plants" class="flex items-center gap-3 rounded-xl px-4 py-3 text-[#d7e6d8] transition hover:bg-white/10">◌ <span>Bitki envanteri</span></NuxtLink>
-        <NuxtLink to="/dashboard" class="flex items-center gap-3 rounded-xl px-4 py-3 text-[#d7e6d8] transition hover:bg-white/10">✓ <span>Bakım kayıtları</span></NuxtLink>
+        <a href="/dashboard" class="flex items-center gap-3 rounded-xl px-4 py-3 text-[#d7e6d8] transition hover:bg-white/10">◈ <span>Genel bakış</span></a>
+        <a href="/customers" class="flex items-center gap-3 rounded-xl px-4 py-3 text-[#d7e6d8] transition hover:bg-white/10">⌂ <span>Müşteriler</span></a>
+        <a href="/plants" class="flex items-center gap-3 rounded-xl px-4 py-3 text-[#d7e6d8] transition hover:bg-white/10">◌ <span>Bitki envanteri</span></a>
+        <a href="/maintenance-logs" class="flex items-center gap-3 rounded-xl px-4 py-3 text-[#d7e6d8] transition hover:bg-white/10">✓ <span>Bakım kayıtları</span></a>
+        <a href="/staff" class="flex items-center gap-3 rounded-xl px-4 py-3 text-[#d7e6d8] transition hover:bg-white/10">◎ <span>Personel</span></a>
       </nav>
       <div class="mt-auto rounded-2xl border border-white/10 bg-white/5 p-4">
         <p class="text-xs text-[#b8cdbb]">Bugünün odağı</p>

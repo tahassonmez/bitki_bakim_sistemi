@@ -57,6 +57,43 @@ export class DashboardService {
     return { customerCount, plantCount, staffCount, todayMaintenanceCount };
   }
 
+  async getActionBreakdown(days = 30) {
+    const since = startOfToday();
+    since.setDate(since.getDate() - days);
+
+    const counts = await this.prisma.maintenanceLogAction.groupBy({
+      by: ['typeId'],
+      where: { log: { date: { gte: since } } },
+      _count: { _all: true },
+    });
+    if (!counts.length) return [];
+
+    const types = await this.prisma.maintenanceType.findMany({
+      where: { id: { in: counts.map((c) => c.typeId) } },
+    });
+    const nameById = new Map(types.map((type) => [type.id, type.name]));
+
+    return counts
+      .map((c) => ({
+        typeId: c.typeId,
+        name: nameById.get(c.typeId) ?? 'Bilinmiyor',
+        count: c._count._all,
+      }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  getRecentLogs(limit = 15) {
+    return this.prisma.maintenanceLog.findMany({
+      orderBy: { date: 'desc' },
+      take: limit,
+      include: {
+        staff: true,
+        actions: { include: { type: true } },
+        plant: { include: { location: { include: { customer: true } } } },
+      },
+    });
+  }
+
   async getTodayTasks(staffId: string) {
     await this.ensureStaff(staffId);
     const tomorrow = startOfTomorrow();

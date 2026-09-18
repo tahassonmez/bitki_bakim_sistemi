@@ -61,15 +61,21 @@ export class PlantsService {
     customerId?: string;
     locationId?: string;
     status?: PlantStatus;
+    code?: string;
   }) {
+    const where: Prisma.PlantWhereInput = {
+      status: filters.status,
+      locationId: filters.locationId,
+      location: filters.customerId
+        ? { customerId: filters.customerId }
+        : undefined,
+    };
+    if (filters.code) {
+      where.plantCode = { equals: filters.code, mode: 'insensitive' };
+    }
+
     return this.prisma.plant.findMany({
-      where: {
-        status: filters.status,
-        locationId: filters.locationId,
-        location: filters.customerId
-          ? { customerId: filters.customerId }
-          : undefined,
-      },
+      where,
       orderBy: { plantCode: 'asc' },
       include: { location: { include: { customer: true } } },
     });

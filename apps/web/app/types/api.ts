@@ -19,6 +19,12 @@ export interface DashboardSummary {
   todayMaintenanceCount: number;
 }
 
+export interface ActionBreakdownItem {
+  typeId: string;
+  name: string;
+  count: number;
+}
+
 export interface PlantTask {
   id: string;
   plantCode: string;
@@ -135,4 +141,67 @@ export interface MaintenanceLog {
   actions: MaintenanceLogActionEntry[];
   products: MaintenanceLogProductEntry[];
   photos: MaintenancePhoto[];
+}
+
+export interface RecentMaintenanceLog {
+  id: string;
+  date: string;
+  staff: MaintenanceStaffRef;
+  actions: MaintenanceLogActionEntry[];
+  plant: {
+    id: string;
+    plantCode: string;
+    name: string;
+    location: { name: string; customer: { id: string; name: string } };
+  };
+}
+
+export interface MaintenanceLogRecord {
+  id: string;
+  date: string;
+  notes: string | null;
+  staff: MaintenanceStaffRef;
+  actions: MaintenanceLogActionEntry[];
+  products: MaintenanceLogProductEntry[];
+  photos: MaintenancePhoto[];
+  plant: {
+    id: string;
+    plantCode: string;
+    name: string;
+    location: { id: string; name: string; customer: { id: string; name: string } };
+  };
+}
+
+export interface MaintenanceLogListResponse {
+  items: MaintenanceLogRecord[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+export interface StaffMember {
+  id: string;
+  fullName: string;
+  email: string;
+  phone: string | null;
+  role: UserRole;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface CreateStaffInput {
+  fullName: string;
+  email: string;
+  phone?: string | null;
+  password: string;
+  role?: UserRole;
+}
+
+export interface UpdateStaffInput {
+  fullName?: string;
+  email?: string;
+  phone?: string | null;
+  password?: string;
+  role?: UserRole;
+  isActive?: boolean;
 }
