@@ -14,6 +14,10 @@
         <span class="flex items-center gap-3"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-[#d8e8cc] text-lg text-[#203d30]">⌂</span><span class="font-semibold">Bugünün görevleri</span></span>
         <span class="text-[#8a948d]">›</span>
       </NuxtLink>
+      <NuxtLink to="/field/plants" class="panel flex items-center justify-between p-4">
+        <span class="flex items-center gap-3"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-[#d8e8cc] text-lg text-[#203d30]">⚘</span><span class="font-semibold">Bitkilerim</span></span>
+        <span class="text-[#8a948d]">›</span>
+      </NuxtLink>
       <NuxtLink to="/field/scan" class="panel flex items-center justify-between p-4">
         <span class="flex items-center gap-3"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-[#d8e8cc] text-lg text-[#203d30]">⌗</span><span class="font-semibold">QR kodu okut</span></span>
         <span class="text-[#8a948d]">›</span>

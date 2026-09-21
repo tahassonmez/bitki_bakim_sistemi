@@ -13,6 +13,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { CustomersService } from './customers.service.js';
 import { CreateCustomerDto } from './dto/create-customer.dto.js';
+import { UpdateAssignedStaffDto } from './dto/update-assigned-staff.dto.js';
 import { UpdateCustomerDto } from './dto/update-customer.dto.js';
 
 @ApiTags('customers')
@@ -45,6 +46,14 @@ export class CustomersController {
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateCustomerDto) {
     return this.customersService.update(id, dto);
+  }
+
+  @Patch(':id/assigned-staff')
+  updateAssignedStaff(
+    @Param('id') id: string,
+    @Body() dto: UpdateAssignedStaffDto,
+  ) {
+    return this.customersService.updateAssignedStaff(id, dto);
   }
 
   @Delete(':id')

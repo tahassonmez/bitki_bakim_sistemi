@@ -12,12 +12,14 @@ Bu dosya tüm günlerin referans aldığı ortak zemin. Bir günün içinde "§ 
 | Auth | `@nestjs/jwt` + `bcryptjs` |
 | Validasyon | `class-validator` / `class-transformer` |
 | API dokümantasyonu | `@nestjs/swagger` |
-| Test | Jest (unit + e2e) |
-| Lint/format | ESLint (type-aware) + Prettier |
+| Test | Vitest (unit + e2e) |
+| Lint/format | oxlint (type-aware) + Prettier |
 | Frontend | Nuxt 4 (Vue 3 + TypeScript) |
 | State | Pinia |
 | Form | VeeValidate + Yup |
 | Stil | Tailwind CSS (`@nuxtjs/tailwindcss`) |
+| QR kod okuma (saha) | `html5-qrcode` |
+| PWA / ana ekrana ekleme | `@vite-pwa/nuxt` |
 | Excel export (ileri faz) | `exceljs` |
 
 ## 2. Klasör yapısı (hedef)
@@ -47,7 +49,8 @@ bitki-bakim-sistemi/
 │       │   └── field.vue
 │       ├── pages/
 │       ├── stores/
-│       └── composables/
+│       ├── composables/
+│       └── plugins/         # pwa.client.ts
 ├── docs/                    # bu rehber
 ├── docker-compose.yml
 ├── pnpm-workspace.yaml
@@ -58,10 +61,11 @@ bitki-bakim-sistemi/
 
 ```
 Customer 1─N Location 1─N Plant 1─N MaintenanceLog N─1 Staff
-                                        │        │
-                                        │        └─N─ Photo
-                                        ├─N─ MaintenanceLogAction ─N─1 MaintenanceType
-                                        └─N─ MaintenanceLogProduct ─N─1 Product
+    │                                   │        │
+    │                                   │        └─N─ Photo
+    │                                   ├─N─ MaintenanceLogAction ─N─1 MaintenanceType
+    │                                   └─N─ MaintenanceLogProduct ─N─1 Product
+    └── Customer N─N Staff (assignedStaff / assignedCustomers — personel ataması) ──┘
 ```
 
 **Kritik nokta:** `Plant` tekil kayıttır — aynı müşteride aynı türden 50 bitki varsa 50 ayrı `Plant` satırı, 50 ayrı `plantCode`, 50 ayrı bakım geçmişi olur. Hiçbir zaman "adet" alanı olan tek bir ürün satırına indirgenmez (§ 4.4, Gün 3 ve Gün 7).
@@ -70,7 +74,7 @@ Customer 1─N Location 1─N Plant 1─N MaintenanceLog N─1 Staff
 
 - **Customer**: `id`, `name`, `address`, `phone`, `email`, `notes`, `createdAt`, `updatedAt`
 - **Location**: `id`, `name`, `customerId`
-- **Staff**: `id`, `fullName`, `email` (unique), `phone`, `passwordHash`, `role` (`ADMIN`/`STAFF`), `isActive`
+- **Staff**: `id`, `fullName`, `email` (unique), `phone`, `passwordHash`, `role` (`ADMIN`/`STAFF`), `isActive`, `assignedCustomers` (Customer ile N─N, hangi müşterilere atandığı)
 - **Plant**: `id`, `plantCode` (unique), `name`, `species`, `locationId`, `potInfo`, `sizeInfo`, `registeredAt`, `careFrequencyDays`, `lastMaintenanceDate`, `nextMaintenanceDate`, `status` (`ACTIVE`/`REMOVED`)
 - **MaintenanceType**: `id`, `name` (unique), `isActive` — sulama, gübreleme, budama, ilaçlama, yaprak temizliği, toprak değişimi, saksı değişimi (seed ile gelir, admin yenisini ekleyebilir)
 - **Product**: `id`, `name`, `type` (`FERTILIZER`/`PESTICIDE`/`OTHER`), `unit`, `stockQuantity` (ileri faz için şimdiden var), `notes`
@@ -107,6 +111,10 @@ Ayrı bir tablo yok. Sorgu zamanında hesaplanır:
 
 `Plant`, `Staff`, `MaintenanceType` hiçbir zaman veritabanından fiziksel olarak silinmez — geçmiş bakım kayıtları referans bütünlüğünü kaybetmesin diye `status`/`isActive` alanıyla pasifleştirilir.
 
+### 4.5 Personel–müşteri erişim kısıtı (MVP sonrası eklendi)
+
+Bir müşteriye admin panelinden (müşteri detay sayfası) birden fazla personel atanabilir (`Customer.assignedStaff` ↔ `Staff.assignedCustomers`, implicit N─N). `role = STAFF` olan bir personel, saha modundaki görev listelerinde (`/staff/:id/today-tasks`, `/staff/:id/upcoming-tasks`) **sadece kendisine atanmış müşterilerin** bitkilerini görür — sorgu, personelin `assignedCustomers` listesindeki müşteri ID'leriyle filtrelenir. `role = ADMIN` olan hesaplar için bu filtre uygulanmaz, tüm sistemi görürler.
+
 ## 5. Ortam değişkenleri stratejisi
 
 - Kök `.env.example`: tüm değişkenlerin şablonu (referans amaçlı, gerçek `.env` değil).
@@ -135,7 +143,7 @@ v1.0-mvp kapsam dışı bırakılan, bir sonraki fazın konusu olan maddeler. He
 1. **Stok takibi** — `Product.stockQuantity` alanı şemada hazır durumda ama kullanım sonrası otomatik düşme, minimum stok uyarısı ve stok giriş ekranı yok.
 2. **Saksı/ürün envanteri** — saksı ve bakım ürünlerinin kendi başına envanter kalemleri olarak (miktar, birim maliyet, tedarikçi) takip edilmesi.
 3. **Bildirimler** — yaklaşan/geciken bakımlar için e-posta veya push bildirimi (şu an sadece dashboard'da pasif olarak görünüyor, kimseye proaktif haber verilmiyor).
-4. **Personel atama sistemi** — bakım görevlerinin belirli bir personele önceden atanması; şu an herhangi bir personel herhangi bir bitkinin bakımını girebiliyor.
+4. ~~**Personel atama sistemi**~~ — ✅ **tamamlandı** (MVP sonrası): müşteri bazlı personel ataması ve buna göre saha modu filtresi eklendi, bkz. § 4.5. Kalan ince ayar: atama, tek tek bitki/görev bazında değil müşteri bazında — daha ince taneli (görev bazlı) atama ileride ayrı bir madde olabilir.
 5. **Raporlama / export** — müşteri bazlı, tarih aralıklı PDF/Excel raporu (§ 1'de `exceljs` bağımlılığı ileri faz için önceden not edilmişti).
 6. **Çoklu şube desteği** — birden fazla ekip/şubenin aynı sistemde ayrı ayrı çalışabilmesi (yetkilendirme ve veri izolasyonu gerektirir).
 7. **Dosya depolamanın S3'e taşınması** — `StorageService` soyutlaması bunun için hazır (§ production-notlari.md), ama üretimde hâlâ yerel diske yazıyor.

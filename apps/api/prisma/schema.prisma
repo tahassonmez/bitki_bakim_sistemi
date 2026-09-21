@@ -30,20 +30,27 @@ enum ProductType {
 }
 
 model Customer {
-  id        String     @id @default(cuid())
-  name      String
-  address   String?
-  phone     String?
-  email     String?
-  notes     String?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  locations Location[]
+  id            String     @id @default(cuid())
+  name          String
+  address       String?
+  phone         String?
+  email         String?
+  notes         String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  locations     Location[]
+  assignedStaff Staff[]    @relation("StaffCustomerAssignment")
 }
 
 model Location {
   id         String   @id @default(cuid())
   name       String
+  // Google Places otomatik tamamlamadan seçilen adres ve koordinatlar —
+  // seçim yapılmazsa boş kalabilir (düz metin adres girişine de izin verir).
+  address    String?
+  latitude   Float?
+  longitude  Float?
+  placeId    String?
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id])
   plants     Plant[]
@@ -53,15 +60,20 @@ model Location {
 }
 
 model Staff {
-  id              String           @id @default(cuid())
-  fullName        String
-  email           String           @unique
-  phone           String?
-  passwordHash    String
-  role            Role             @default(STAFF)
-  isActive        Boolean          @default(true)
-  createdAt       DateTime         @default(now())
-  maintenanceLogs MaintenanceLog[]
+  id                String           @id @default(cuid())
+  fullName          String
+  email             String           @unique
+  phone             String?
+  passwordHash      String
+  role              Role             @default(STAFF)
+  isActive          Boolean          @default(true)
+  createdAt         DateTime         @default(now())
+  maintenanceLogs   MaintenanceLog[]
+  assignedCustomers Customer[]       @relation("StaffCustomerAssignment")
+  sentMessages      Message[]        @relation("SentMessages")
+  receivedMessages  Message[]        @relation("ReceivedMessages")
+  sentGroupMessages GroupMessage[]   @relation("SentGroupMessages")
+  groupRead         GroupMessageRead?
 }
 
 model Plant {
@@ -148,4 +160,42 @@ model Photo {
   url          String
   uploadedById String
   createdAt    DateTime       @default(now())
+}
+
+model Message {
+  id         String    @id @default(cuid())
+  senderId   String
+  sender     Staff     @relation("SentMessages", fields: [senderId], references: [id])
+  receiverId String
+  receiver   Staff     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  body       String?
+  photoUrl   String?
+  createdAt  DateTime  @default(now())
+  readAt     DateTime?
+
+  @@index([senderId, receiverId])
+  @@index([receiverId, readAt])
+}
+
+// Tüm aktif personelin otomatik olarak içinde olduğu ortak (genel) sohbet
+// odası. Üyelik ayrı bir tabloyla tutulmuyor — "isActive" olan her personel
+// zaten otomatik olarak bu odanın bir parçası sayılıyor.
+model GroupMessage {
+  id        String   @id @default(cuid())
+  senderId  String
+  sender    Staff    @relation("SentGroupMessages", fields: [senderId], references: [id])
+  body      String?
+  photoUrl  String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+// Her personelin ortak sohbeti en son ne zaman okuduğunu tutuyor; okunmamış
+// sayısı bu tarihten sonra gönderilen (kendi göndermediği) mesajlar sayılarak
+// hesaplanıyor.
+model GroupMessageRead {
+  staffId    String   @id
+  staff      Staff    @relation(fields: [staffId], references: [id])
+  lastReadAt DateTime @default(now())
 }

@@ -3,11 +3,13 @@ import {
   Controller,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { Roles } from '../auth/decorators/roles.decorator.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
@@ -47,5 +49,19 @@ export class StaffController {
   @Get(':id/today-tasks')
   getTodayTasks(@Param('id') id: string) {
     return this.staffService.getTodayTasks(id);
+  }
+
+  @Get(':id/upcoming-tasks')
+  @ApiQuery({ name: 'days', required: false, type: Number, example: 7 })
+  getUpcomingTasks(
+    @Param('id') id: string,
+    @Query('days', new ParseIntPipe({ optional: true })) days?: number,
+  ) {
+    return this.staffService.getUpcomingTasks(id, days ?? 7);
+  }
+
+  @Get(':id/plants')
+  getAssignedPlants(@Param('id') id: string) {
+    return this.staffService.getAssignedPlants(id);
   }
 }

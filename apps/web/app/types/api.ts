@@ -55,12 +55,24 @@ export interface CustomerInput {
 export interface Location {
   id: string;
   name: string;
+  address?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  placeId?: string | null;
   customerId: string;
   _count?: { plants: number };
 }
 
+export interface AssignedStaffRef {
+  id: string;
+  fullName: string;
+  email: string;
+  isActive: boolean;
+}
+
 export interface CustomerDetail extends Customer {
   locations: Location[];
+  assignedStaff: AssignedStaffRef[];
 }
 
 export type PlantStatus = 'ACTIVE' | 'REMOVED';
@@ -204,4 +216,37 @@ export interface UpdateStaffInput {
   password?: string;
   role?: UserRole;
   isActive?: boolean;
+}
+
+export interface ChatContact {
+  id: string;
+  fullName: string;
+  role: UserRole;
+}
+
+export interface ChatMessage {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  body: string | null;
+  photoUrl: string | null;
+  createdAt: string;
+  readAt: string | null;
+  sender: ChatContact;
+  receiver: ChatContact;
+}
+
+export interface ChatConversation {
+  partner: ChatContact;
+  lastMessage: ChatMessage;
+  unreadCount: number;
+}
+
+export interface GroupChatMessage {
+  id: string;
+  senderId: string;
+  body: string | null;
+  photoUrl: string | null;
+  createdAt: string;
+  sender: ChatContact;
 }

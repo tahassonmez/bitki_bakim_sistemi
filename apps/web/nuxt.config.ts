@@ -4,6 +4,27 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt', '@vite-pwa/nuxt'],
   css: ['~/assets/css/main.css'],
+  app: {
+    head: {
+      // iOS Safari, manifest'teki "display: standalone" ayarını kendi başına
+      // dikkate almıyor — ana ekrana eklenen sayfanın adres çubuğu olmadan,
+      // gerçek bir uygulama gibi açılması için bu meta etiketleri gerekiyor.
+      link: [
+        { rel: 'apple-touch-icon', href: '/icon-192.png' },
+        // @vite-pwa/nuxt normalde bu etiketi kendisi ekliyor ama bu projede
+        // bir sebepten (henüz netleştiremediğimiz bir nedenle) otomatik ekleme
+        // çalışmıyor — manifest dosyası sunucudan doğru geliyor, sadece sayfaya
+        // bağlanmıyordu. Elle ekleyerek garantiye alıyoruz.
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+      ],
+      meta: [
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+        { name: 'apple-mobile-web-app-title', content: 'BitkiBakım' },
+        { name: 'theme-color', content: '#203d30' },
+      ],
+    },
+  },
   runtimeConfig: {
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE ?? 'http://localhost:3001',

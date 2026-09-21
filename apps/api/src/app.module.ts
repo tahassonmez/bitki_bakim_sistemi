@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
+import { ChatModule } from './chat/chat.module.js';
 import { CustomersModule } from './customers/customers.module.js';
 import { DashboardModule } from './dashboard/dashboard.module.js';
 import { HealthController } from './health/health.controller.js';
@@ -29,6 +30,7 @@ import { StaffModule } from './staff/staff.module.js';
     ProductsModule,
     MaintenanceLogsModule,
     PhotosModule,
+    ChatModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

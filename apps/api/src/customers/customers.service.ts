@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateCustomerDto } from './dto/create-customer.dto.js';
+import { UpdateAssignedStaffDto } from './dto/update-assigned-staff.dto.js';
 import { UpdateCustomerDto } from './dto/update-customer.dto.js';
 
 @Injectable()
@@ -28,6 +29,10 @@ export class CustomersService {
         locations: {
           orderBy: { name: 'asc' },
           include: { _count: { select: { plants: true } } },
+        },
+        assignedStaff: {
+          select: { id: true, fullName: true, email: true, isActive: true },
+          orderBy: { fullName: 'asc' },
         },
       },
     });
@@ -66,6 +71,24 @@ export class CustomersService {
   async update(id: string, dto: UpdateCustomerDto) {
     await this.findOne(id);
     return this.prisma.customer.update({ where: { id }, data: dto });
+  }
+
+  async updateAssignedStaff(id: string, dto: UpdateAssignedStaffDto) {
+    await this.findOne(id);
+    return this.prisma.customer.update({
+      where: { id },
+      data: {
+        assignedStaff: {
+          set: dto.staffIds.map((staffId) => ({ id: staffId })),
+        },
+      },
+      include: {
+        assignedStaff: {
+          select: { id: true, fullName: true, email: true, isActive: true },
+          orderBy: { fullName: 'asc' },
+        },
+      },
+    });
   }
 
   async remove(id: string) {

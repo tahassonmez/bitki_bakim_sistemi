@@ -79,6 +79,7 @@ export class StaffService {
   async getTodayTasks(staffId: string) {
     const staff = await this.prisma.staff.findUnique({
       where: { id: staffId },
+      include: { assignedCustomers: { select: { id: true } } },
     });
     if (!staff) throw new NotFoundException('Staff member not found');
 
@@ -87,13 +88,77 @@ export class StaffService {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
+    // STAFF rolündeki personel sadece kendisine atanmış müşterilerin
+    // bakımlarını görür. Yöneticiler (ADMIN) için filtre uygulanmaz.
+    const assignedCustomerIds = staff.assignedCustomers.map((c) => c.id);
+
     return this.prisma.plant.findMany({
       where: {
         status: 'ACTIVE',
         nextMaintenanceDate: { lt: tomorrow },
+        ...(staff.role === Role.STAFF
+          ? { location: { customerId: { in: assignedCustomerIds } } }
+          : {}),
       },
       include: { location: { include: { customer: true } } },
       orderBy: [{ nextMaintenanceDate: 'asc' }, { plantCode: 'asc' }],
+    });
+  }
+
+  async getUpcomingTasks(staffId: string, days = 7) {
+    const staff = await this.prisma.staff.findUnique({
+      where: { id: staffId },
+      include: { assignedCustomers: { select: { id: true } } },
+    });
+    if (!staff) throw new NotFoundException('Staff member not found');
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const limit = new Date(today);
+    limit.setDate(limit.getDate() + days);
+
+    const assignedCustomerIds = staff.assignedCustomers.map((c) => c.id);
+
+    return this.prisma.plant.findMany({
+      where: {
+        status: 'ACTIVE',
+        nextMaintenanceDate: { gte: tomorrow, lte: limit },
+        ...(staff.role === Role.STAFF
+          ? { location: { customerId: { in: assignedCustomerIds } } }
+          : {}),
+      },
+      include: { location: { include: { customer: true } } },
+      orderBy: [{ nextMaintenanceDate: 'asc' }, { plantCode: 'asc' }],
+    });
+  }
+
+  async getAssignedPlants(staffId: string) {
+    const staff = await this.prisma.staff.findUnique({
+      where: { id: staffId },
+      include: { assignedCustomers: { select: { id: true } } },
+    });
+    if (!staff) throw new NotFoundException('Staff member not found');
+
+    // STAFF rolündeki personel sadece kendisine atanmış müşterilerin
+    // bitkilerini görür — bakım tarihine bakılmaksızın, bakmakla yükümlü
+    // olduğu tüm bitkilerin tam listesi. Yöneticiler (ADMIN) için filtre
+    // uygulanmaz.
+    const assignedCustomerIds = staff.assignedCustomers.map((c) => c.id);
+
+    return this.prisma.plant.findMany({
+      where: {
+        status: 'ACTIVE',
+        ...(staff.role === Role.STAFF
+          ? { location: { customerId: { in: assignedCustomerIds } } }
+          : {}),
+      },
+      include: { location: { include: { customer: true } } },
+      // Müşteri bazında gruplama arayüzde yapılıyor; burada konum ve bitki
+      // koduna göre sıralamak yeterli (Prisma'da iki seviyeli ilişki
+      // sıralaması yerine tek seviyeli, garanti desteklenen bir sıralama).
+      orderBy: [{ location: { name: 'asc' } }, { plantCode: 'asc' }],
     });
   }
 

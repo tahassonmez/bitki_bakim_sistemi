@@ -91,16 +91,24 @@
       </div>
       <div v-if="!allPhotos.length" class="panel mt-4 p-8 text-center text-sm text-[#68736d]">Henüz fotoğraf eklenmedi.</div>
       <div v-else class="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4 xl:grid-cols-6">
-        <button
-          v-for="photo in allPhotos"
-          :key="photo.id"
-          type="button"
-          class="aspect-square overflow-hidden rounded-xl border border-[#dfe5dc]"
-          @click="lightboxPhoto = photo.url"
-        >
-          <img :src="photo.url" class="size-full object-cover" alt="Bakım fotoğrafı" />
-        </button>
+        <div v-for="photo in allPhotos" :key="photo.id" class="relative aspect-square overflow-hidden rounded-xl border border-[#dfe5dc]">
+          <button type="button" class="size-full" @click="lightboxPhoto = photo.url">
+            <img :src="photo.url" class="size-full object-cover" alt="Bakım fotoğrafı" />
+          </button>
+          <button
+            type="button"
+            class="absolute right-1.5 top-1.5 grid size-7 place-items-center rounded-full bg-black/55 text-sm font-semibold text-white transition hover:bg-[#a15d47] disabled:opacity-50 print:hidden"
+            :disabled="deletingPhotoId === photo.id"
+            title="Fotoğrafı sil"
+            aria-label="Fotoğrafı sil"
+            @click.stop="onDeletePhoto(photo)"
+          >
+            <span v-if="deletingPhotoId === photo.id">…</span>
+            <span v-else aria-hidden="true">×</span>
+          </button>
+        </div>
       </div>
+      <p v-if="photoDeleteError" class="mt-3 text-sm text-[#a15d47]">{{ photoDeleteError }}</p>
 
       <div v-if="lightboxPhoto" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-6" @click="lightboxPhoto = null">
         <img :src="lightboxPhoto" class="max-h-full max-w-full rounded-xl" alt="Bakım fotoğrafı büyük görünüm" />
@@ -111,7 +119,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from '~/stores/auth';
-import type { MaintenanceLog, PlantDetail } from '~/types/api';
+import type { MaintenanceLog, MaintenancePhoto, PlantDetail } from '~/types/api';
 
 definePageMeta({ layout: false });
 
@@ -147,6 +155,24 @@ async function onMaintenanceSaved() {
 
 const allPhotos = computed(() => (logs.value ?? []).flatMap((log) => log.photos));
 const lightboxPhoto = ref<string | null>(null);
+
+const deletingPhotoId = ref<string | null>(null);
+const photoDeleteError = ref('');
+
+async function onDeletePhoto(photo: MaintenancePhoto) {
+  if (!confirm('Bu fotoğrafı silmek istediğine emin misin? Bu işlem geri alınamaz.')) return;
+  photoDeleteError.value = '';
+  deletingPhotoId.value = photo.id;
+  try {
+    await request(`/photos/${photo.id}`, { method: 'DELETE' });
+    if (lightboxPhoto.value === photo.url) lightboxPhoto.value = null;
+    await refreshLogs();
+  } catch {
+    photoDeleteError.value = 'Fotoğraf silinemedi. Tekrar dene.';
+  } finally {
+    deletingPhotoId.value = null;
+  }
+}
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);

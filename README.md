@@ -12,6 +12,18 @@ Bir bitki bakım ekibi, onlarca müşteride yüzlerce bitkiyi düzenli aralıkla
 - Bir bakım kaydı girildiğinde **sıradaki bakım tarihi otomatik hesaplanır** (`bakım tarihi + bakım sıklığı`).
 - Yönetici, tüm müşteriler/bitkiler genelinde **yaklaşan ve geciken bakımları** tek ekrandan görür.
 - Sahadaki personel, bitkinin üzerindeki **QR kodu okutarak** doğrudan o bitkinin bakım formuna gider — bitki aramaya gerek kalmaz.
+- Her personel **sadece kendisine atanmış müşterilerin** bakımlarını görür; yöneticiler kısıtsız görür.
+
+## MVP sonrası eklenen özellikler
+
+İlk 20 günlük MVP tamamlandıktan sonra, gerçek kullanım geri bildirimiyle eklenen özellikler:
+
+- **Personel–müşteri atama** — müşteri detay sayfasından bir müşteriye birden fazla personel atanabiliyor; saha modundaki "Bugünün bakımları" listesi personelin sadece kendi atandığı müşterilere göre filtreleniyor (§ 4.5).
+- **Personel profili** — Personeller sayfasında her personelin kişisel bilgileri görüntülenebiliyor ve giriş şifresi admin tarafından değiştirilebiliyor.
+- **Saha modunda yaklaşan bakımlar** — personel girişindeki "Bugünün bakımları" ekranına, admin panosundakiyle aynı tasarımda bir "Yaklaşan bakımlar" bölümü eklendi (önümüzdeki 7 gün).
+- **Bakım fotoğrafı silme** — bitki detay sayfasındaki fotoğraf galerisinden yanlış/gereksiz fotoğraflar tek tıkla silinebiliyor.
+- **Mobil yönetici menüsü** — admin paneli artık dar ekranlarda (telefon) kaybolmuyor; hamburger menüyle açılan bir kayar menü eklendi.
+- **PWA / ana ekrana ekleme** — uygulama artık telefonda "ana ekrana ekle" ile gerçek bir uygulama gibi (tarayıcı çubuğu olmadan) açılabiliyor.
 
 ## Mimari özeti
 
@@ -21,13 +33,14 @@ Kısa özet aşağıda; veri modeli, iş kuralları ve teknoloji tercihlerinin *
 - [§ 3 Veri modeli](./docs/00-proje-genel-bakis.md#3-veri-modeli-özet-er)
 - [§ 4 İş kuralları](./docs/00-proje-genel-bakis.md#4-i̇ş-kuralları) (otomatik tarih hesaplama, yaklaşan/geciken sorguları, plantCode üretimi, silme yerine pasifleştirme)
 
-**Kısaca:** pnpm workspace monorepo'su. `apps/api` NestJS + Prisma + PostgreSQL ile REST API'yi sağlar (JWT auth, rol bazlı yetkilendirme, QR üretimi, fotoğraf yükleme, dashboard/raporlama endpoint'leri). `apps/web` Nuxt 4 + Pinia ile hem yönetici masaüstü panelini (`admin` layout) hem de saha personelinin mobil/PWA akışını (`field` layout) tek kod tabanından sunar.
+**Kısaca:** pnpm workspace monorepo'su. `apps/api` NestJS + Prisma + PostgreSQL ile REST API'yi sağlar (JWT auth, rol bazlı yetkilendirme, personel-müşteri atama, QR üretimi, fotoğraf yükleme/silme, dashboard/raporlama endpoint'leri). `apps/web` Nuxt 4 + Pinia ile hem yönetici masaüstü panelini (`admin` layout, mobilde hamburger menüsüyle) hem de saha personelinin mobil/PWA akışını (`field` layout) tek kod tabanından sunar; `@vite-pwa/nuxt` ile telefonun ana ekranına gerçek bir uygulama gibi eklenebilir.
 
 ```
 Customer 1─N Location 1─N Plant 1─N MaintenanceLog N─1 Staff
-                                        │        └─N─ Photo
-                                        ├─N─ MaintenanceLogAction ─N─1 MaintenanceType
-                                        └─N─ MaintenanceLogProduct ─N─1 Product
+    │                                   │        └─N─ Photo
+    │                                   ├─N─ MaintenanceLogAction ─N─1 MaintenanceType
+    │                                   └─N─ MaintenanceLogProduct ─N─1 Product
+    └─────────────── N─N (atama) ───────────────────────────────────┘ Staff
 ```
 
 ## Klasör yapısı
@@ -46,6 +59,7 @@ bitki-bakim-sistemi/
 │           ├── pages/      # customers, plants, dashboard, staff, field/*
 │           ├── stores/     # Pinia (auth)
 │           ├── composables/# useApi (backend çağrıları)
+│           ├── plugins/    # pwa.client.ts (servis çalışanı kaydı)
 │           └── types/      # paylaşılan API tipleri
 ├── docs/                   # mimari referans + 20 günlük uygulama günlüğü
 │   ├── 00-proje-genel-bakis.md
