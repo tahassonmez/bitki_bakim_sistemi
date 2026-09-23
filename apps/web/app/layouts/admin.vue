@@ -2,8 +2,8 @@
   <div class="min-h-screen bg-[#f7f8f4]">
     <aside class="fixed inset-y-0 left-0 hidden w-72 flex-col border-r border-[#dfe5dc] bg-[#203d30] px-6 py-7 text-white lg:flex">
       <NuxtLink to="/dashboard" class="mb-12 flex items-center gap-3">
-        <span class="grid size-11 place-items-center rounded-2xl bg-[#d8e8cc] text-xl text-[#203d30]">✦</span>
-        <span><strong class="display block text-lg">Verdant</strong><small class="text-xs text-[#b8cdbb]">Bitki bakım merkezi</small></span>
+        <img src="/jungleous-logo.png" alt="Jungleous" class="h-12 w-auto shrink-0 rounded-xl bg-white p-1.5" />
+        <small class="text-xs text-[#b8cdbb]">Bitki bakım merkezi</small>
       </NuxtLink>
       <nav class="space-y-2 text-sm">
         <a href="/dashboard" class="flex items-center gap-3 rounded-xl px-4 py-3 text-[#d7e6d8] transition hover:bg-white/10">◈ <span>Genel bakış</span></a>
@@ -22,6 +22,12 @@
         <p class="text-xs text-[#b8cdbb]">Bugünün odağı</p>
         <p class="mt-2 text-sm leading-5 text-white">Saha ekibinin bakım akışını tek bakışta tut.</p>
       </div>
+      <div class="mt-4 text-xs">
+        <p class="text-[#b8cdbb]">Taha Sönmez</p>
+        <a href="https://www.linkedin.com/in/taha-s%C3%B6nmez-615081341/" target="_blank" rel="noopener" class="mt-1 block text-[#d7e6d8] hover:underline">LinkedIn</a>
+        <a href="https://github.com/tahassonmez" target="_blank" rel="noopener" class="mt-1 block text-[#d7e6d8] hover:underline">GitHub</a>
+        <a href="mailto:sonmeztaha00@gmail.com" class="mt-1 block text-[#d7e6d8] hover:underline">sonmeztaha00@gmail.com</a>
+      </div>
     </aside>
 
     <!-- Mobil menü: küçük ekranlarda soldaki kayar panel + arka plan karartması -->
@@ -35,8 +41,8 @@
       >
         <div class="mb-10 flex items-center justify-between">
           <NuxtLink to="/dashboard" class="flex items-center gap-3" @click="mobileMenuOpen = false">
-            <span class="grid size-11 place-items-center rounded-2xl bg-[#d8e8cc] text-xl text-[#203d30]">✦</span>
-            <span><strong class="display block text-lg">Verdant</strong><small class="text-xs text-[#b8cdbb]">Bitki bakım merkezi</small></span>
+            <img src="/jungleous-logo.png" alt="Jungleous" class="h-12 w-auto shrink-0 rounded-xl bg-white p-1.5" />
+            <small class="text-xs text-[#b8cdbb]">Bitki bakım merkezi</small>
           </NuxtLink>
           <button class="text-2xl leading-none text-white/70" type="button" aria-label="Menüyü kapat" @click="mobileMenuOpen = false">×</button>
         </div>
@@ -56,6 +62,12 @@
         <div class="mt-auto rounded-2xl border border-white/10 bg-white/5 p-4">
           <p class="text-xs text-[#b8cdbb]">Bugünün odağı</p>
           <p class="mt-2 text-sm leading-5 text-white">Saha ekibinin bakım akışını tek bakışta tut.</p>
+        </div>
+        <div class="mt-4 text-xs">
+          <p class="text-[#b8cdbb]">Taha Sönmez</p>
+          <a href="https://www.linkedin.com/in/taha-s%C3%B6nmez-615081341/" target="_blank" rel="noopener" class="mt-1 block text-[#d7e6d8] hover:underline">LinkedIn</a>
+          <a href="https://github.com/tahassonmez" target="_blank" rel="noopener" class="mt-1 block text-[#d7e6d8] hover:underline">GitHub</a>
+          <a href="mailto:sonmeztaha00@gmail.com" class="mt-1 block text-[#d7e6d8] hover:underline">sonmeztaha00@gmail.com</a>
         </div>
       </aside>
     </Transition>
