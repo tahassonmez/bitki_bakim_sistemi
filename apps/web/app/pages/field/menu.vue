@@ -26,7 +26,7 @@
 
     <div class="panel mt-6 p-5">
       <p class="text-sm font-semibold">Bitki Bakım Sistemi</p>
-      <p class="mt-1 text-sm leading-6 text-[#68736d]">Sürüm 1.0 · Verdant saha uygulaması</p>
+      <p class="mt-1 text-sm leading-6 text-[#68736d]">Sürüm 1.0 · Jungleous saha uygulaması</p>
     </div>
 
     <button class="button-secondary mt-6 w-full !min-h-12 !border-[#e4cfc5] !text-[#a15d47]" type="button" @click="auth.logout()">Çıkış yap</button>

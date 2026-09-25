@@ -2,12 +2,12 @@
   <main class="grid min-h-screen lg:grid-cols-[1.05fr_0.95fr]">
     <section class="relative hidden overflow-hidden bg-[#203d30] px-12 py-12 text-white lg:flex lg:flex-col lg:justify-between">
       <div class="absolute -right-32 top-20 size-96 rounded-full border-[46px] border-[#d8e8cc]/20" />
-      <div class="relative"><span class="grid size-12 place-items-center rounded-2xl bg-[#d8e8cc] text-xl text-[#203d30]">✦</span><p class="mt-7 text-sm font-semibold uppercase tracking-[0.22em] text-[#b8cdbb]">JUNGLEOUS </p><h1 class="display mt-5 max-w-lg text-5xl font-semibold leading-[1.05]">Bakımı iyi yapılan her bitki, iyi işleyen bir alan yaratır.</h1></div>
+      <div class="relative"><img src="/jungleous-logo.png" alt="Jungleous" class="h-14 w-auto rounded-xl bg-white p-2" /><h1 class="display mt-7 max-w-lg text-5xl font-semibold leading-[1.05]">Bakımı iyi yapılan her bitki, iyi işleyen bir alan yaratır.</h1></div>
       <p class="relative max-w-sm text-sm leading-6 text-[#d7e6d8]">Müşteriler, tekil bitkiler ve saha bakım kayıtları tek sakin akışta.</p>
     </section>
     <section class="flex items-center justify-center px-5 py-12 sm:px-10">
       <div class="w-full max-w-md">
-        <div class="mb-10 lg:hidden"><span class="grid size-12 place-items-center rounded-2xl bg-[#d8e8cc] text-xl text-[#203d30]">✦</span><p class="mt-4 text-sm font-semibold uppercase tracking-[0.18em] text-[#2f6b4f]">Verdant</p></div>
+        <div class="mb-10 lg:hidden"><img src="/jungleous-logo.png" alt="Jungleous" class="h-12 w-auto rounded-xl bg-white p-1.5" /></div>
         <p class="text-sm font-semibold uppercase tracking-[0.18em] text-[#6b786f]">Hoş geldiniz</p>
         <h2 class="display mt-3 text-4xl font-semibold tracking-tight">Sisteme giriş yapın</h2>
         <p class="mt-3 text-[#68736d]">Saha ve yönetim akışınıza devam edin.</p>
