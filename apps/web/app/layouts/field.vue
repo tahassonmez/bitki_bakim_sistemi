@@ -70,6 +70,7 @@ const pageTitle = computed(() => {
   if (route.path.startsWith('/field/scan')) return 'QR kodu okut';
   if (route.path.startsWith('/field/menu')) return 'Menü';
   if (route.path.startsWith('/field/plants')) return 'Bitkilerim';
+  if (route.path.startsWith('/field/identify')) return 'Bitki Tanı';
   if (route.path.startsWith('/plants/')) return 'Bitki detayı';
   if (route.path === '/chat') return 'Sohbet';
   if (route.path.startsWith('/chat/')) return 'Sohbet';

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+import { AiModule } from './ai/ai.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { ChatModule } from './chat/chat.module.js';
 import { CustomersModule } from './customers/customers.module.js';
@@ -31,6 +32,7 @@ import { StaffModule } from './staff/staff.module.js';
     MaintenanceLogsModule,
     PhotosModule,
     ChatModule,
+    AiModule,
   ],
   controllers: [AppController, HealthController],
   providers: [AppService],

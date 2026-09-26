@@ -46,6 +46,8 @@
           </div>
         </div>
 
+        <PlantAiIdentify @identified="onAiIdentified" />
+
         <div class="grid gap-5 sm:grid-cols-2">
           <div>
             <label class="mb-2 block text-sm font-semibold" for="plant-name">Bitki adı</label>
@@ -100,7 +102,7 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate';
 import * as yup from 'yup';
-import type { Customer, Location, Plant } from '~/types/api';
+import type { Customer, Location, Plant, PlantIdentificationResult } from '~/types/api';
 
 definePageMeta({ layout: 'admin' });
 
@@ -156,6 +158,11 @@ const [quantity] = defineField('quantity');
 watch(customerId, () => {
   locationId.value = '';
 });
+
+function onAiIdentified(result: PlantIdentificationResult) {
+  if (result.name) name.value = result.name;
+  if (result.species) species.value = result.species;
+}
 
 const onSubmit = handleSubmit(async (values) => {
   loading.value = true;

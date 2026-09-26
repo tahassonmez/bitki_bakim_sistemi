@@ -22,6 +22,10 @@
         <span class="flex items-center gap-3"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-[#d8e8cc] text-lg text-[#203d30]">⌗</span><span class="font-semibold">QR kodu okut</span></span>
         <span class="text-[#8a948d]">›</span>
       </NuxtLink>
+      <NuxtLink to="/field/identify" class="panel flex items-center justify-between p-4">
+        <span class="flex items-center gap-3"><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-[#d8e8cc] text-lg text-[#203d30]">✧</span><span class="font-semibold">Bitki Tanı</span></span>
+        <span class="text-[#8a948d]">›</span>
+      </NuxtLink>
     </div>
 
     <div class="panel mt-6 p-5">

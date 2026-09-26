@@ -90,6 +90,13 @@ export interface Plant {
   location: { id: string; name: string; customer: { id: string; name: string } };
 }
 
+export interface PlantIdentificationResult {
+  name: string;
+  species: string;
+  description: string;
+  careTips: string;
+}
+
 export interface PlantDetail extends Plant {
   potInfo: string | null;
   sizeInfo: string | null;
